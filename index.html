@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Overlay Chat</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      font-family: 'Arial', sans-serif;
+    }
+
+    #chat-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .chat-message {
+      background: linear-gradient(135deg, #7f00ff, #e100ff);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 14px;
+      max-width: 400px;
+      font-size: 16px;
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    .username {
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/tmi.js"></script>
+  <script>
+    const client = new tmi.Client({
+      channels: ['SEU_CANAL_TWITCH']
+    });
+
+    client.connect();
+
+    const container = document.getElementById('chat-container');
+
+    function getRandomColor() {
+      const cores = ['#FF69B4', '#FFD700', '#00FFFF', '#ADFF2F', '#FF4500', '#7B68EE'];
+      return cores[Math.floor(Math.random() * cores.length)];
+    }
+
+    client.on('message', (channel, tags, message, self) => {
+      const msg = document.createElement('div');
+      msg.className = 'chat-message';
+
+      const username = document.createElement('span');
+      username.className = 'username';
+      username.textContent = tags['display-name'] + ': ';
+      username.style.color = getRandomColor();
+
+      const texto = document.createElement('span');
+      texto.textContent = message;
+
+      msg.appendChild(username);
+      msg.appendChild(texto);
+
+      container.appendChild(msg);
+
+      if (container.children.length > 10) {
+        container.removeChild(container.firstChild);
+      }
+    });
+  </script>
+</body>
+</html>
